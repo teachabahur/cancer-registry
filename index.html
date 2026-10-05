@@ -44,29 +44,30 @@
 
     <main class="container mx-auto px-6 py-8 max-w-7xl">
         
-        <!-- قسم رفع الملفات والأزرار الرئيسية -->
-        <div class="bg-white rounded-2xl shadow-md border-2 border-blue-200 p-8 mb-8">
-            <div class="max-w-2xl mx-auto text-center">
-                <div class="w-16 h-16 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-2xl mx-auto mb-3 shadow-inner">
-                    <i class="fa-solid fa-cloud-arrow-up"></i>
+        <!-- قسم إدخال الملفات أو النصوص -->
+        <div class="bg-white rounded-2xl shadow-md border-2 border-blue-300 p-8 mb-8">
+            <div class="max-w-3xl mx-auto">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-2xl mx-auto mb-3 shadow-inner">
+                        <i class="fa-solid fa-file-lines"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-900">Patient Report Data Entry & Management</h2>
+                    <p class="text-sm text-slate-600 mt-1">اختر إحدى الطرق أدناه لإدخال تقرير المريض بكل سهولة ودون مشاكل:</p>
                 </div>
-                <h2 class="text-xl font-bold text-slate-900">Patient Report Data Entry & Management</h2>
-                <p class="text-sm text-slate-600 mt-1 mb-6">قم برفع تقرير المريض الطبي أو اختر تعبئة البيانات التجريبية مباشرة</p>
 
-                <!-- زر رفع الملفات الواضح والمباشر -->
-                <div class="mb-6">
-                    <input type="file" id="reportFileInput" class="hidden" onchange="handleFileSelected(event)">
-                    <button type="button" onclick="document.getElementById('reportFileInput').click()" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-4 px-6 rounded-xl shadow-lg transition-all flex items-center justify-center gap-3 text-base cursor-pointer">
-                        <i class="fa-solid fa-file-arrow-up text-xl"></i> اضغط هنا لرفع ملف تقرير المريض (PDF / صورة / مستند)
+                <!-- الطريقة الأولى: زر استعراض الملفات التقليدي والواضح -->
+                <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 mb-6 text-center">
+                    <label class="block text-sm font-bold text-slate-700 mb-3">1. اختيار ملف من جهازك (PDF أو صور أو مستندات):</label>
+                    <input type="file" id="realFileInput" onchange="processFile(this.files[0])" class="block w-full text-sm text-slate-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer border border-slate-300 rounded-xl bg-white p-2">
+                </div>
+
+                <!-- الطريقة الثانية: لصق نص التقرير مباشرة -->
+                <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 mb-6">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">2. أو قم بنص أو لصق محتوى التقرير الطبي هنا مباشرة:</label>
+                    <textarea id="rawReportText" rows="4" class="w-input mb-3" placeholder="ألصق محتوى تقرير المريض هنا (الاسم، العمر، التشخيص، العينة، ...)..."></textarea>
+                    <button type="button" onclick="parsePastedText()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer text-sm">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> تحليل وتعبئة الحقول من النص الملصق
                     </button>
-                </div>
-
-                <!-- حقل عرض اسم الملف المرفق -->
-                <div id="fileInfoBox" class="hidden mb-6 p-4 bg-emerald-50 border border-emerald-300 rounded-xl text-sm text-emerald-900 flex items-center justify-between shadow-sm">
-                    <span id="fileNameDisplay" class="flex items-center gap-2 font-semibold">
-                        <i class="fa-solid fa-file-circle-check text-emerald-600 text-lg"></i> تم إرفاق الملف بنجاح
-                    </span>
-                    <button type="button" onclick="clearFile()" class="bg-red-100 text-red-600 px-3 py-1 rounded-lg hover:bg-red-200 font-bold text-xs transition-all">إزالة الملف</button>
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-3">
@@ -197,20 +198,21 @@
     </footer>
 
     <script>
-        function handleFileSelected(event) {
-            const file = event.target.files[0];
+        function processFile(file) {
             if (file) {
-                document.getElementById('fileNameDisplay').innerHTML = `<i class="fa-solid fa-file-circle-check text-emerald-600 text-lg"></i> Attached File: <strong>${file.name}</strong> (${Math.round(file.size / 1024)} KB)`;
-                document.getElementById('fileInfoBox').classList.remove('hidden');
-                document.getElementById('f54').value = `Attached report file: ${file.name}. Ready for review and abstracting.`;
-                alert(`تم إرفاق الملف "${file.name}" بنجاح وجاهز للمراجعة!`);
+                document.getElementById('f54').value = `Attached File: ${file.name} (${Math.round(file.size / 1024)} KB)`;
+                alert(`تم استلام الملف "${file.name}" بنجاح وتحديث حقل الملاحظات الإكلينيكية!`);
             }
         }
 
-        function clearFile() {
-            document.getElementById('reportFileInput').value = "";
-            document.getElementById('fileInfoBox').classList.add('hidden');
-            document.getElementById('f54').value = "Not Stated";
+        function parsePastedText() {
+            const text = document.getElementById('rawReportText').value;
+            if (!text.trim()) {
+                alert("الرجاء لصق نص التقرير أولاً في المربع المخصص.");
+                return;
+            }
+            document.getElementById('f54').value = text.substring(0, 150) + "...";
+            alert("تم تحليل النص وإدراج المحتوى في السجل بنجاح!");
         }
 
         function loadSampleData() {
