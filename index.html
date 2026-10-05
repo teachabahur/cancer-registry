@@ -49,17 +49,17 @@
             <div class="max-w-xl mx-auto">
                 <div class="mb-4">
                     <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-3">
-                        <i class="fa-solid fa-file-pdf"></i>
+                        <i class="fa-solid fa-file-image"></i>
                     </div>
-                    <h2 class="text-lg font-bold text-slate-800">Upload Patient Report PDF / Scanned Image</h2>
-                    <p class="text-sm text-slate-500 mt-1">Smart Local OCR: Extracts text dynamically and populates fields intelligently.</p>
+                    <h2 class="text-lg font-bold text-slate-800">Upload Patient Report (Image / Scanned Document)</h2>
+                    <p class="text-sm text-slate-500 mt-1">For best results, upload report as image (.jpg, .png) or use manual fill.</p>
                 </div>
 
                 <label class="flex flex-col items-center justify-center border-2 border-dashed border-blue-300 rounded-xl p-6 bg-blue-50/50 hover:bg-blue-50 cursor-pointer transition-all">
                     <i class="fa-solid fa-cloud-arrow-up text-3xl text-blue-500 mb-2"></i>
-                    <span class="text-sm font-semibold text-blue-900">Click to select file or drag & drop here</span>
+                    <span class="text-sm font-semibold text-blue-900">Click to select image file or drag & drop</span>
                     <span id="fileNameDisplay" class="text-xs font-bold text-blue-600 mt-2 bg-blue-100 px-3 py-1 rounded-full hidden"></span>
-                    <input type="file" id="pdfFileInput" accept=".pdf,.png,.jpg,.jpeg" class="hidden" onchange="handleFileSelect(event)">
+                    <input type="file" id="imageFileInput" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
                 </label>
 
                 <div id="ocrStatus" class="text-xs font-semibold text-blue-600 mt-3"></div>
@@ -195,10 +195,13 @@
             const file = event.target.files[0];
             const displayBadge = document.getElementById('fileNameDisplay');
             const processBtn = document.getElementById('processBtn');
+            const statusDiv = document.getElementById('ocrStatus');
+
             if (file) {
-                displayBadge.textContent = "Selected file: " + file.name;
+                displayBadge.textContent = "Selected image: " + file.name;
                 displayBadge.classList.remove('hidden');
                 processBtn.disabled = false;
+                statusDiv.textContent = "";
             } else {
                 displayBadge.classList.add('hidden');
                 processBtn.disabled = true;
@@ -206,16 +209,16 @@
         }
 
         async function startAiAbstraction() {
-            const fileInput = document.getElementById('pdfFileInput');
+            const fileInput = document.getElementById('imageFileInput');
             const statusDiv = document.getElementById('ocrStatus');
             
             if (!fileInput.files || fileInput.files.length === 0) {
-                alert("Please select a file first.");
+                alert("Please select an image file first.");
                 return;
             }
 
             const file = fileInput.files[0];
-            statusDiv.textContent = "Running intelligent local OCR... Please wait.";
+            statusDiv.textContent = "Running Tesseract OCR engine on image... Please wait.";
 
             try {
                 const worker = await Tesseract.createWorker('eng');
@@ -223,43 +226,43 @@
                 const text = ret.data.text;
                 await worker.terminate();
 
-                statusDiv.textContent = "OCR extraction completed! Analyzing text patterns...";
+                statusDiv.textContent = "OCR extraction completed successfully!";
                 parseTextIntelligently(text);
 
             } catch (error) {
                 console.error(error);
-                statusDiv.textContent = "OCR error occurred. Please check console.";
+                statusDiv.textContent = "OCR error occurred. Ensure file is a valid image (PNG/JPG).";
             }
         }
 
         function parseTextIntelligently(text) {
             const cleanText = text.replace(/\s+/g, ' ').trim();
             
-            // عرض النص المستخرج كاملاً في الحقل الأخير كمرجع
-            document.getElementById('f54').value = cleanText.substring(0, 200) + (cleanText.length > 200 ? '...' : '');
+            // وضع النص المستخرج في الملاحظات كمرجع
+            document.getElementById('f54').value = cleanText.substring(0, 180) + (cleanText.length > 180 ? '...' : '');
 
-            // محاولة ذكية لاكتشاف الجنس
+            // اكتشاف الجنس
             if (/\bmale\b/i.test(cleanText) && !/\bfemale\b/i.test(cleanText)) {
                 document.getElementById('f13').value = "Male";
             } else if (/\bfemale\b/i.test(cleanText)) {
                 document.getElementById('f13').value = "Female";
             }
 
-            // محاولة البحث عن الأعمار (مثل Age: 50 أو 45 years)
+            // استخراج العمر
             const ageMatch = cleanText.match(/(?:age|yrs|years)[\s:]+(\d{1,3})/i);
             if (ageMatch) {
                 document.getElementById('f12').value = ageMatch[1] + " Years";
             }
 
-            // محاولة البحث عن أرقام التقارير أو الملفات (مثل HP-xxxx أو MRN)
-            const hpMatch = cleanText.match(/(?:HP|H\.P\.|Report|No)[\s:\-\#]*([A-Za-z0-9\-\/]+)/i);
-            if (hpMatch) {
-                document.getElementById('f29').value = hpMatch[1];
+            // استخراج رقم التقرير
+            const reportMatch = cleanText.match(/(?:HP|H\.P\.|Report|No|MRN)[\s:\-\#]*([A-Za-z0-9\-\/]+)/i);
+            if (reportMatch) {
+                document.getElementById('f29').value = reportMatch[1];
             }
 
-            // محاولة اكتشاف بعض مصطلحات الأورام الشائعة لتعبئة الحقول بمرونة
+            // استخراج نوع التشخيص
             if (/carcinoma/i.test(cleanText)) {
-                document.getElementById('f34').value = "Carcinoma (Detected from report)";
+                document.getElementById('f34').value = "Carcinoma (Detected)";
                 document.getElementById('f35').value = "8010/3";
             } else if (/adenocarcinoma/i.test(cleanText)) {
                 document.getElementById('f34').value = "Adenocarcinoma";
@@ -268,20 +271,10 @@
                 document.getElementById('f34').value = "Sarcoma";
                 document.getElementById('f35').value = "8800/3";
             } else {
-                document.getElementById('f34').value = cleanText.substring(0, 40);
+                document.getElementById('f34').value = cleanText.substring(0, 35) || "Analyzed Record";
             }
 
-            // تعبئة افتراضية ذكية للاسم إذا وجد كلمة Patient أو Name
-            const nameMatch = cleanText.match(/(?:name|patient)[\s:]+([A-Za-z\s]{3,30})/i);
-            if (nameMatch) {
-                document.getElementById('f2').value = nameMatch[1].trim();
-                document.getElementById('f3').value = "مستخرج من التقرير";
-            } else {
-                document.getElementById('f2').value = "Scanned Record File";
-                document.getElementById('f3').value = "سجل مريض جديد";
-            }
-
-            alert("Data successfully abstracted and mapped using dynamic OCR parsing!");
+            alert("Data extracted and mapped successfully from image!");
             window.scrollTo({ top: document.getElementById('qcSection').offsetTop - 20, behavior: 'smooth' });
         }
 
