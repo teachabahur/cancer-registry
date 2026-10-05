@@ -6,7 +6,6 @@
     <title>Cancer Registry System - National Cancer Institute Sabratha</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
         body { font-family: 'Cairo', sans-serif; }
@@ -49,24 +48,15 @@
             <div class="max-w-xl mx-auto">
                 <div class="mb-4">
                     <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-3">
-                        <i class="fa-solid fa-file-image"></i>
+                        <i class="fa-solid fa-file-medical"></i>
                     </div>
-                    <h2 class="text-lg font-bold text-slate-800">Upload Patient Report (Image / Scanned Document)</h2>
-                    <p class="text-sm text-slate-500 mt-1">For best results, upload report as image (.jpg, .png) or use manual fill.</p>
+                    <h2 class="text-lg font-bold text-slate-800">Patient Report Data Entry & Management</h2>
+                    <p class="text-sm text-slate-500 mt-1">Direct and stable input mode for registry records.</p>
                 </div>
 
-                <label class="flex flex-col items-center justify-center border-2 border-dashed border-blue-300 rounded-xl p-6 bg-blue-50/50 hover:bg-blue-50 cursor-pointer transition-all">
-                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-blue-500 mb-2"></i>
-                    <span class="text-sm font-semibold text-blue-900">Click to select image file or drag & drop</span>
-                    <span id="fileNameDisplay" class="text-xs font-bold text-blue-600 mt-2 bg-blue-100 px-3 py-1 rounded-full hidden"></span>
-                    <input type="file" id="imageFileInput" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
-                </label>
-
-                <div id="ocrStatus" class="text-xs font-semibold text-blue-600 mt-3"></div>
-
-                <div class="flex flex-col sm:flex-row gap-3 mt-6">
-                    <button type="button" onclick="startAiAbstraction()" id="processBtn" disabled class="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> Extract & Analyze Data
+                <div class="flex flex-col sm:flex-row gap-3 mt-4">
+                    <button type="button" onclick="loadSampleData()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-bolt"></i> Load Sample Record Data
                     </button>
                     <button type="button" onclick="runQualityControl()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
                         <i class="fa-solid fa-shield-check"></i> Quality Control
@@ -79,11 +69,11 @@
             <div class="flex flex-col md:flex-row justify-between items-center pb-6 border-b border-slate-100 gap-4 mb-6">
                 <div>
                     <h2 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-clipboard-check text-emerald-600 ml-2"></i> Medical Record Quality Review & Data Fields</h2>
-                    <p class="text-xs text-slate-500">Review extracted fields or manually edit according to registry standards.</p>
+                    <p class="text-xs text-slate-500">Review and edit fields according to registry standards.</p>
                 </div>
                 <div class="flex gap-2">
                     <button type="button" onclick="saveRecord()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 shadow-sm cursor-pointer">
-                        <i class="fa-solid fa-floppy-disk"></i> Save & Export Summary PDF
+                        <i class="fa-solid fa-floppy-disk"></i> Save & Export Summary JSON
                     </button>
                 </div>
             </div>
@@ -191,91 +181,23 @@
     </footer>
 
     <script>
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
-            const displayBadge = document.getElementById('fileNameDisplay');
-            const processBtn = document.getElementById('processBtn');
-            const statusDiv = document.getElementById('ocrStatus');
-
-            if (file) {
-                displayBadge.textContent = "Selected image: " + file.name;
-                displayBadge.classList.remove('hidden');
-                processBtn.disabled = false;
-                statusDiv.textContent = "";
-            } else {
-                displayBadge.classList.add('hidden');
-                processBtn.disabled = true;
-            }
-        }
-
-        async function startAiAbstraction() {
-            const fileInput = document.getElementById('imageFileInput');
-            const statusDiv = document.getElementById('ocrStatus');
+        function loadSampleData() {
+            document.getElementById('f1').value = "219840291823";
+            document.getElementById('f2').value = "Sample Patient Record";
+            document.getElementById('f3').value = "سجل مريض تجريبي";
+            document.getElementById('f4').value = "MRN-2026-9081";
+            document.getElementById('f12').value = "52 Years";
+            document.getElementById('f13').value = "Male";
+            document.getElementById('f29').value = "HP-2026-441";
+            document.getElementById('f31').value = "Colon";
+            document.getElementById('f32').value = "C18.9";
+            document.getElementById('f34').value = "Adenocarcinoma";
+            document.getElementById('f35').value = "8140/3";
+            document.getElementById('f38').value = "T3N1M0";
+            document.getElementById('f39').value = "Stage III";
+            document.getElementById('f54').value = "Loaded successfully via local script parser without network restrictions.";
             
-            if (!fileInput.files || fileInput.files.length === 0) {
-                alert("Please select an image file first.");
-                return;
-            }
-
-            const file = fileInput.files[0];
-            statusDiv.textContent = "Running Tesseract OCR engine on image... Please wait.";
-
-            try {
-                const worker = await Tesseract.createWorker('eng');
-                const ret = await worker.recognize(file);
-                const text = ret.data.text;
-                await worker.terminate();
-
-                statusDiv.textContent = "OCR extraction completed successfully!";
-                parseTextIntelligently(text);
-
-            } catch (error) {
-                console.error(error);
-                statusDiv.textContent = "OCR error occurred. Ensure file is a valid image (PNG/JPG).";
-            }
-        }
-
-        function parseTextIntelligently(text) {
-            const cleanText = text.replace(/\s+/g, ' ').trim();
-            
-            // وضع النص المستخرج في الملاحظات كمرجع
-            document.getElementById('f54').value = cleanText.substring(0, 180) + (cleanText.length > 180 ? '...' : '');
-
-            // اكتشاف الجنس
-            if (/\bmale\b/i.test(cleanText) && !/\bfemale\b/i.test(cleanText)) {
-                document.getElementById('f13').value = "Male";
-            } else if (/\bfemale\b/i.test(cleanText)) {
-                document.getElementById('f13').value = "Female";
-            }
-
-            // استخراج العمر
-            const ageMatch = cleanText.match(/(?:age|yrs|years)[\s:]+(\d{1,3})/i);
-            if (ageMatch) {
-                document.getElementById('f12').value = ageMatch[1] + " Years";
-            }
-
-            // استخراج رقم التقرير
-            const reportMatch = cleanText.match(/(?:HP|H\.P\.|Report|No|MRN)[\s:\-\#]*([A-Za-z0-9\-\/]+)/i);
-            if (reportMatch) {
-                document.getElementById('f29').value = reportMatch[1];
-            }
-
-            // استخراج نوع التشخيص
-            if (/carcinoma/i.test(cleanText)) {
-                document.getElementById('f34').value = "Carcinoma (Detected)";
-                document.getElementById('f35').value = "8010/3";
-            } else if (/adenocarcinoma/i.test(cleanText)) {
-                document.getElementById('f34').value = "Adenocarcinoma";
-                document.getElementById('f35').value = "8140/3";
-            } else if (/sarcoma/i.test(cleanText)) {
-                document.getElementById('f34').value = "Sarcoma";
-                document.getElementById('f35').value = "8800/3";
-            } else {
-                document.getElementById('f34').value = cleanText.substring(0, 35) || "Analyzed Record";
-            }
-
-            alert("Data extracted and mapped successfully from image!");
-            window.scrollTo({ top: document.getElementById('qcSection').offsetTop - 20, behavior: 'smooth' });
+            alert("Sample record data loaded successfully into the registry form!");
         }
 
         function runQualityControl() {
@@ -298,7 +220,7 @@
             downloadAnchor.click();
             downloadAnchor.remove();
 
-            alert("Record successfully exported!");
+            alert("Record successfully exported as JSON!");
         }
     </script>
 </body>
