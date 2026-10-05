@@ -44,17 +44,31 @@
 
     <main class="container mx-auto px-6 py-8 max-w-7xl">
         
+        <!-- Upload & Control Section -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-8 text-center">
             <div class="max-w-xl mx-auto">
                 <div class="mb-4">
                     <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-3">
-                        <i class="fa-solid fa-file-medical"></i>
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
                     </div>
                     <h2 class="text-lg font-bold text-slate-800">Patient Report Data Entry & Management</h2>
-                    <p class="text-sm text-slate-500 mt-1">Direct and stable input mode for registry records.</p>
+                    <p class="text-sm text-slate-500 mt-1">Upload medical reports/files or load sample data directly.</p>
                 </div>
 
-                <div class="flex flex-col sm:flex-row gap-3 mt-4">
+                <!-- File Upload Box -->
+                <div class="border-2 border-dashed border-slate-300 rounded-xl p-6 bg-slate-50 hover:bg-slate-100/50 transition-all cursor-pointer mb-5" onclick="document.getElementById('reportFileInput').click()">
+                    <i class="fa-solid fa-file-arrow-up text-3xl text-blue-500 mb-2"></i>
+                    <p class="text-sm font-semibold text-slate-700">Click to upload medical report or drop files here</p>
+                    <p class="text-xs text-slate-400 mt-1">Supports PDF, Images (PNG, JPG), or Word docs</p>
+                    <input type="file" id="reportFileInput" class="hidden" onchange="handleFileSelected(event)">
+                </div>
+
+                <div id="fileInfoBox" class="hidden mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-900 flex items-center justify-between">
+                    <span id="fileNameDisplay"><i class="fa-solid fa-file-circle-check text-blue-600 ml-2"></i> File attached</span>
+                    <button type="button" onclick="clearFile()" class="text-red-500 hover:text-red-700 font-bold">Remove</button>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3">
                     <button type="button" onclick="loadSampleData()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
                         <i class="fa-solid fa-bolt"></i> Load Sample Record Data
                     </button>
@@ -65,6 +79,7 @@
             </div>
         </div>
 
+        <!-- Data Entry & Quality Review Form -->
         <div id="qcSection" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-8">
             <div class="flex flex-col md:flex-row justify-between items-center pb-6 border-b border-slate-100 gap-4 mb-6">
                 <div>
@@ -181,6 +196,23 @@
     </footer>
 
     <script>
+        function handleFileSelected(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById('fileNameDisplay').innerHTML = `<i class="fa-solid fa-file-circle-check text-blue-600 ml-2"></i> Attached File: <strong>${file.name}</strong>`;
+                document.getElementById('fileInfoBox').classList.remove('hidden');
+                
+                // Simulate automatic parsing/loading status into form
+                document.getElementById('f54').value = `Report file attached: ${file.name} (${Math.round(file.size / 1024)} KB). Ready for abstracting.`;
+            }
+        }
+
+        function clearFile() {
+            document.getElementById('reportFileInput').value = "";
+            document.getElementById('fileInfoBox').classList.add('hidden');
+            document.getElementById('f54').value = "File removed.";
+        }
+
         function loadSampleData() {
             document.getElementById('f1').value = "219840291823";
             document.getElementById('f2').value = "Sample Patient Record";
@@ -195,7 +227,7 @@
             document.getElementById('f35').value = "8140/3";
             document.getElementById('f38').value = "T3N1M0";
             document.getElementById('f39').value = "Stage III";
-            document.getElementById('f54').value = "Loaded successfully via local script parser without network restrictions.";
+            document.getElementById('f54').value = "Loaded successfully via local script parser.";
             
             alert("Sample record data loaded successfully into the registry form!");
         }
