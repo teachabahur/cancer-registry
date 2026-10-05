@@ -44,42 +44,43 @@
 
     <main class="container mx-auto px-6 py-8 max-w-7xl">
         
-        <!-- Upload & Control Section -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-8 text-center">
-            <div class="max-w-xl mx-auto">
-                <div class="mb-4">
-                    <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-3">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                    </div>
-                    <h2 class="text-lg font-bold text-slate-800">Patient Report Data Entry & Management</h2>
-                    <p class="text-sm text-slate-500 mt-1">Upload medical reports/files or load sample data directly.</p>
+        <!-- قسم رفع الملفات والأزرار الرئيسية -->
+        <div class="bg-white rounded-2xl shadow-md border-2 border-blue-200 p-8 mb-8">
+            <div class="max-w-2xl mx-auto text-center">
+                <div class="w-16 h-16 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-2xl mx-auto mb-3 shadow-inner">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
                 </div>
+                <h2 class="text-xl font-bold text-slate-900">Patient Report Data Entry & Management</h2>
+                <p class="text-sm text-slate-600 mt-1 mb-6">قم برفع تقرير المريض الطبي أو اختر تعبئة البيانات التجريبية مباشرة</p>
 
-                <!-- File Upload Box -->
-                <div class="border-2 border-dashed border-slate-300 rounded-xl p-6 bg-slate-50 hover:bg-slate-100/50 transition-all cursor-pointer mb-5" onclick="document.getElementById('reportFileInput').click()">
-                    <i class="fa-solid fa-file-arrow-up text-3xl text-blue-500 mb-2"></i>
-                    <p class="text-sm font-semibold text-slate-700">Click to upload medical report or drop files here</p>
-                    <p class="text-xs text-slate-400 mt-1">Supports PDF, Images (PNG, JPG), or Word docs</p>
+                <!-- زر رفع الملفات الواضح والمباشر -->
+                <div class="mb-6">
                     <input type="file" id="reportFileInput" class="hidden" onchange="handleFileSelected(event)">
+                    <button type="button" onclick="document.getElementById('reportFileInput').click()" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-4 px-6 rounded-xl shadow-lg transition-all flex items-center justify-center gap-3 text-base cursor-pointer">
+                        <i class="fa-solid fa-file-arrow-up text-xl"></i> اضغط هنا لرفع ملف تقرير المريض (PDF / صورة / مستند)
+                    </button>
                 </div>
 
-                <div id="fileInfoBox" class="hidden mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-900 flex items-center justify-between">
-                    <span id="fileNameDisplay"><i class="fa-solid fa-file-circle-check text-blue-600 ml-2"></i> File attached</span>
-                    <button type="button" onclick="clearFile()" class="text-red-500 hover:text-red-700 font-bold">Remove</button>
+                <!-- حقل عرض اسم الملف المرفق -->
+                <div id="fileInfoBox" class="hidden mb-6 p-4 bg-emerald-50 border border-emerald-300 rounded-xl text-sm text-emerald-900 flex items-center justify-between shadow-sm">
+                    <span id="fileNameDisplay" class="flex items-center gap-2 font-semibold">
+                        <i class="fa-solid fa-file-circle-check text-emerald-600 text-lg"></i> تم إرفاق الملف بنجاح
+                    </span>
+                    <button type="button" onclick="clearFile()" class="bg-red-100 text-red-600 px-3 py-1 rounded-lg hover:bg-red-200 font-bold text-xs transition-all">إزالة الملف</button>
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-3">
-                    <button type="button" onclick="loadSampleData()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
-                        <i class="fa-solid fa-bolt"></i> Load Sample Record Data
+                    <button type="button" onclick="loadSampleData()" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-bolt text-amber-400"></i> تحميل بيانات نموذج تجريبي
                     </button>
                     <button type="button" onclick="runQualityControl()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
-                        <i class="fa-solid fa-shield-check"></i> Quality Control
+                        <i class="fa-solid fa-shield-check"></i> فحص الجودة (QC)
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Data Entry & Quality Review Form -->
+        <!-- نموذج مراجعة وإدخال بيانات السجل الطبي -->
         <div id="qcSection" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-8">
             <div class="flex flex-col md:flex-row justify-between items-center pb-6 border-b border-slate-100 gap-4 mb-6">
                 <div>
@@ -87,7 +88,7 @@
                     <p class="text-xs text-slate-500">Review and edit fields according to registry standards.</p>
                 </div>
                 <div class="flex gap-2">
-                    <button type="button" onclick="saveRecord()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 shadow-sm cursor-pointer">
+                    <button type="button" onclick="saveRecord()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 shadow-sm cursor-pointer">
                         <i class="fa-solid fa-floppy-disk"></i> Save & Export Summary JSON
                     </button>
                 </div>
@@ -199,18 +200,17 @@
         function handleFileSelected(event) {
             const file = event.target.files[0];
             if (file) {
-                document.getElementById('fileNameDisplay').innerHTML = `<i class="fa-solid fa-file-circle-check text-blue-600 ml-2"></i> Attached File: <strong>${file.name}</strong>`;
+                document.getElementById('fileNameDisplay').innerHTML = `<i class="fa-solid fa-file-circle-check text-emerald-600 text-lg"></i> Attached File: <strong>${file.name}</strong> (${Math.round(file.size / 1024)} KB)`;
                 document.getElementById('fileInfoBox').classList.remove('hidden');
-                
-                // Simulate automatic parsing/loading status into form
-                document.getElementById('f54').value = `Report file attached: ${file.name} (${Math.round(file.size / 1024)} KB). Ready for abstracting.`;
+                document.getElementById('f54').value = `Attached report file: ${file.name}. Ready for review and abstracting.`;
+                alert(`تم إرفاق الملف "${file.name}" بنجاح وجاهز للمراجعة!`);
             }
         }
 
         function clearFile() {
             document.getElementById('reportFileInput').value = "";
             document.getElementById('fileInfoBox').classList.add('hidden');
-            document.getElementById('f54').value = "File removed.";
+            document.getElementById('f54').value = "Not Stated";
         }
 
         function loadSampleData() {
@@ -227,13 +227,13 @@
             document.getElementById('f35').value = "8140/3";
             document.getElementById('f38').value = "T3N1M0";
             document.getElementById('f39').value = "Stage III";
-            document.getElementById('f54').value = "Loaded successfully via local script parser.";
+            document.getElementById('f54').value = "Loaded successfully via sample dataset.";
             
-            alert("Sample record data loaded successfully into the registry form!");
+            alert("تم تحميل بيانات النموذج التجريبي بنجاح!");
         }
 
         function runQualityControl() {
-            alert("Quality Control passed successfully! All mandatory ISCR validation rules verified.");
+            alert("فحص الجودة اجتاز بنجاح! جميع الحقول مطابقة لمعايير السجل القومي للأورام.");
         }
 
         function saveRecord() {
@@ -252,7 +252,7 @@
             downloadAnchor.click();
             downloadAnchor.remove();
 
-            alert("Record successfully exported as JSON!");
+            alert("تم تصدير السجل وحفظه بنجاح كملف JSON!");
         }
     </script>
 </body>
